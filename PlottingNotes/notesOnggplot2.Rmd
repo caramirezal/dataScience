@@ -1,0 +1,85 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+library(ggplot2)
+
+# Loading the data
+DO <- read.csv("Berthomieux2012/mainTextData/msb201270-df3A.txt",
+               skip = 52,header = FALSE)
+
+names(DO) <- c("time","DO")
+fakeColors <- factor(sample(1:5,length(DO[,1]),replace=TRUE))
+```
+
+
+Plotting scatterplots *geom_point()*
+
+
+```{r}
+# Creating a simple scatter plot
+p <- ggplot(DO, aes(time,DO)) + geom_point()
+plot(p)
+```
+
+
+Adjusting the color of the points *colour*
+
+```{r}
+ggplot(DO, aes(time,DO)) + geom_point(colour="green")
+```
+
+
+Adjusting the size of the points *size*
+
+```{r}
+ggplot(DO, aes(time,DO)) + geom_point(size=10)
+```
+
+Changing point shapes *shape*
+
+```{r}
+ggplot(DO,aes(time, DO)) + geom_point(shape=5)
+```
+
+Adding color levels *colour=factor*
+
+Colour parameter can be assigned inside aes() and geom_point().
+
+```{r}
+ggplot(DO, aes(time,DO)) + geom_point(colour=fakeColors)
+```
+
+
+Create a gradient of colors *scale_color_gradient()*
+
+```{r}
+ggplot(DO, aes(time, DO, colour=DO)) + geom_point() + scale_color_gradient(low="red",high = "yellow")
+```
+
+Creating non filled points *solid=FALSE*
+
+```{r}
+ggplot(DO, aes(time,DO)) + geom_point(shape=1) + scale_shape(solid = FALSE) 
+```
+
+Fitting a smooth line model to a scatter plot *geom_smooth()*
+
+```{r}
+ggplot(DO, aes(time,DO)) + geom_point(colour="green") + geom_smooth()
+```
+
+Mixing point styles *geom_point()*
+
+```{r}
+p <- ggplot(DO, aes(time, DO)) +   geom_point(size=8) + geom_point(colour="green",size=2)
+plot(p)
+```
+
+
+
+
