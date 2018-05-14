@@ -26,7 +26,7 @@ ld.predict <- predict(lin.dis,newdata = input[-train,])
 ## Observed
 clps <- rep("non CLP",nrow(input[-train,]))
 clps[input[-train,"Cell"]=="CLP"] <- "CLP"
-clps
+clps[1:10]
 
 ## Predicted
 pred_class <- rep("non CLP",nrow(input[-train,]))
@@ -41,3 +41,5 @@ table(pred_class_t,clps)
 
 ## binarize an array
 ifelse(abs(cor_data[1:nrow(cor_data),]) == 1,1,0)
+
+
