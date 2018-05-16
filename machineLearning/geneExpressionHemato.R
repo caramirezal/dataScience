@@ -2,44 +2,60 @@
 ## https://www.sciencedirect.com/science/article/pii/S1079979613001587?via%3Dihub
 
 library(MASS)     ## performs LDA
+library(caret)
+library(dplyr)
+library(e1071)    ## necessary to load caret lda
+library(ggplot2)
 
 data <- read.csv("../data/NIHMS53736-supplement-9.csv")
 
-input <- as.data.frame(data) 
+input <- data
 input[,1] <- sapply(as.character(input[,"Cell"]),
                  function(x) substr(x,1,nchar(x)-3))
 input[,1] <- as.factor(input[,1])
 
 
-
 ## Hierarchical clustering heatmap
-heatmap(as.matrix(data.df),Colv = NA)
+heatmap(as.matrix(input[,-1]),Colv = NA)
 
 #############################################################################
-n_train <- 0.8*nrow(input)
+## performing lda using caret
 
-train <- sample(1:nrow(input),n_train)
+## Create data partition
+train <- createDataPartition(input[,"Cell"],p = 0.8,list = FALSE)
 
-lin.dis <- lda(Cell~.,data=input,subset=train)
-ld.predict <- predict(lin.dis,newdata = input[-train,])
+## Using caret to perform lda and to get confusion matrix
+## perform lad
+lda.fit <- train(Cell~.,data=input,subset=train,method="lda")
 
-## Observed
-clps <- rep("non CLP",nrow(input[-train,]))
-clps[input[-train,"Cell"]=="CLP"] <- "CLP"
-clps[1:10]
+## perform prediction
+lda.prediction <- predict(lda.fit,newdata = input[-train,])
 
-## Predicted
-pred_class <- rep("non CLP",nrow(input[-train,]))
-pred_class[ld.predict$class[-train]=="CLP"] <- "CLP"
-table(pred_class,clps)
+## calculate confusion matrix
+confusion.m <- confusionMatrix(lda.prediction,input$Cell[-train])
+
+############################################################################
+## performing iteration over technique using trainControl
+## 10 repeats and nfold = 5
+fitControl <- trainControl(method = "repeatedcv",repeats = 10,number = 5)
+lda.fit <- train(Cell~.,data=input,subset=train,
+                 method="lda",
+                 trControl=fitControl) ## definition of the iteration
+                 
+head(lda.fit$resample)  ## accuracy results for every simulation
+lda.fit$results    ## mean and sd values for accuracy and kappa
+
+###########################################################################
+## PCA preprocessing using caret
+lda.fit <- train(Cell~.,data=input,subset=train,method="lda",preProcess="pca")
+lda.prediction <- predict(lda.fit,newdata = input[-train,])
+confusion.m <- confusionMatrix(lda.prediction,input$Cell[-train])
+confusion.m
 
 
-## predicted with threshold
-pred_class_t <- rep("non CLP",nrow(input[-train,]))
-pred_class_t[ld.predict$posterior[,1]>=0.45] <- "CLP" 
-table(pred_class_t,clps)
+############################################################################
+## PCA rotation
+rotated <- prcomp(input[,-1])
 
-## binarize an array
-ifelse(abs(cor_data[1:nrow(cor_data),]) == 1,1,0)
-
-
+## plotting two principal components
+plot(rotated$x[,1],rotated$x[,2],col=input[,"Cell"],pch=20)
