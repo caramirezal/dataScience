@@ -5,7 +5,6 @@ library(MASS)     ## performs LDA
 library(caret)
 library(dplyr)
 library(e1071)    ## necessary to load caret lda
-library(ggplot2)
 
 data <- read.csv("../data/NIHMS53736-supplement-9.csv")
 
@@ -13,7 +12,7 @@ input <- data
 input[,1] <- sapply(as.character(input[,"Cell"]),
                  function(x) substr(x,1,nchar(x)-3))
 input[,1] <- as.factor(input[,1])
-
+head(input)
 
 ## Hierarchical clustering heatmap
 heatmap(as.matrix(input[,-1]),Colv = NA)
@@ -27,12 +26,15 @@ train <- createDataPartition(input[,"Cell"],p = 0.8,list = FALSE)
 ## Using caret to perform lda and to get confusion matrix
 ## perform lad
 lda.fit <- train(Cell~.,data=input,subset=train,method="lda")
+head(lda.fit$resample)
 
 ## perform prediction
 lda.prediction <- predict(lda.fit,newdata = input[-train,])
+lda.prediction[1:10]
 
 ## calculate confusion matrix
 confusion.m <- confusionMatrix(lda.prediction,input$Cell[-train])
+confusion.m$byClass
 
 ############################################################################
 ## performing iteration over technique using trainControl
@@ -55,7 +57,10 @@ confusion.m
 
 ############################################################################
 ## PCA rotation
-rotated <- prcomp(input[,-1])
+rotated <- prcomp(input[,-1],rank. = 18)
+summary(rotated)
 
 ## plotting two principal components
 plot(rotated$x[,1],rotated$x[,2],col=input[,"Cell"],pch=20)
+
+names(getModelInfo())
