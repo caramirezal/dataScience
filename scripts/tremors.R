@@ -2,6 +2,7 @@
 library(ggmap)
 library(lubridate)
 library(dplyr)
+library(gridExtra)
 
 ## coordinates of the center of the map
 myLocation <- c(-100.27,20.25)
@@ -17,7 +18,7 @@ myMap <- get_map(location = myLocation,
 ## http://www2.ssn.unam.mx:8080/catalogo/
 
 ## data processing
-data <- read.csv("../data/SSNMX_catalogo_19500101_20180521.csv",skip = 4,stringsAsFactors = FALSE)
+data <- read.csv("../data/tremors.csv",skip = 4,stringsAsFactors = FALSE)
 data <- mutate(data,Fecha=as.POSIXct(strptime(data$Fecha.UTC, format = "%Y-%m-%d")))
 
 ## data slice and processing
@@ -32,37 +33,42 @@ head(data.p)
 
 
 ## plotting tremors data
-data.s <- filter(data.p)
+data.s <- filter(data.p, time > '2018-05-01' & Magnitud > 4 )
 jpeg("../figures/tremors.jpg")
+
+## Map of tremors
 g <- ggmap(myMap) 
 g <- g + geom_point(aes(x=Longitud,y=Latitud,
                         colour=Magnitud,
-                        size=exp(Magnitud),
-                        alpha=magnNorm),
+                        size=exp(Magnitud)),
                     data=data.s) 
 g <- g + scale_color_gradient(low="yellow",high = "red")
 g <- g + scale_size_continuous(range = c(0.1,7))
+g <- g + xlab("Longitud") + ylab("Latitud")
+g <- g + theme(legend.position = "none")
+g <- g + theme(axis.title.x = element_text(face="bold"),
+                 axis.title.y = element_text(face="bold"))
 plot(g)
-dev.off()
 
 ###########################################################################################
-## exploratory plots
+# Trends in tremors magnitud
+theme_set(theme_bw())
+g1 <- ggplot(data=data.p, aes(x=time,y=Magnitud,colour=Magnitud))
+g1 <- g1 + geom_point()
+g1 <- g1 + geom_smooth()
+g1 <- g1 + annotate("text", color="brown",
+                    fontface=2,                            ## bold
+                    x=as.POSIXct("2015-01-16"),y=8.2,label="sept 2017")
+g1 <- g1 + annotate("text",color="brown",
+                    fontface=2,                            ## bold
+                    x=as.POSIXct("1988-03-16"),y=8.2,label="sept 1985")
+g1 <- g1 + theme(axis.title.x = element_text(face="bold"),
+                 axis.title.y = element_text(face="bold"))
+g1 <- g1 + theme(legend.position = "none")                  ## remove color code
+plot(g1)
 
-## magnitud dynamic
-plot(data.p$time,
-     data.p$Magnitud,
-     type="l",lwd=2,col="steelblue",
-     xlab = "Time",ylab = "Magnitud",font.lab=2)
-head(data.p)
 
 
-
-## normalizing Magnitud
-data.p <- mutate(data.p,magnNorm=(Magnitud-min(Magnitud))/
-                         (max(Magnitud)-min(Magnitud)))
-data.p <- mutate(data.p,profundidadNorm=(Profundidad-mean(Profundidad))/sd(Profundidad))
-data.p <- mutate(data.p,distancia=(19.390519-Latitud)^2+(99.4238064-Longitud)^2) ## distance to cdmx
-data.p <- mutate(data.p,proximidad=1/distancia)
 
 
 
