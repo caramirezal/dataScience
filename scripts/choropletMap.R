@@ -2,6 +2,9 @@
 library(mxmaps)
 library(dplyr)
 
+## Data was downloaded from the following INE link
+## https://computos2018.ine.mx/#/descargaBase
+
 ##############################################################################
 ## Data preprocessing
 
