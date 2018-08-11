@@ -1,4 +1,6 @@
 ## NCBI data using using E-utility calls
+## See https://www.ncbi.nlm.nih.gov/books/NBK25500/
+
 library(xml2)
 
 baseURL <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
