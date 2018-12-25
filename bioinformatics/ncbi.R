@@ -71,3 +71,6 @@ for (b in batch[1:2]){
         print(query)
 }
 
+#################################################################################
+## Download all files from PMC
+wget ftp://ftp.ncbi.nlm.nih.gov/pub/pmc/oa_bulk/*txt.tar.gz
