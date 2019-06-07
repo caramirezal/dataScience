@@ -1,7 +1,20 @@
 #!/bin/bash
 
+## remove files
+rm file.txt
+
+## decompress zip files
+unzip file.zip
+
+## unzip tar files
+tar -xvzf file.tar.gz
+
+## less with zip files
+zless file.fa.gz
+
 ## variable definition in bash
 var1=10
+echo $var1
 
 ## Basic loop in bash
 for i in 1 2 3; do
