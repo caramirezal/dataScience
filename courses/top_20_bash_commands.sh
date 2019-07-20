@@ -73,25 +73,33 @@ grep AAA*TT data/mitochondrion.1.1.genomic.fna    ## find 'AAATT(any)TAC'
 ## 13. Replace patterns
 sed 's/AAATT//g' data/mitochondrion.1.1.genomic.fna   ## Replace AAA*TT with '*'
 
-## Sort
+## 14. Sort
+## First, downloading table file example
+wget https://raw.githubusercontent.com/caramirezal/dataScience/master/data/gwas.tsv -P data
+less data/gwas.tsv                                   ## inspecting tsv file
+sort -k8nr data/gwas.tsv > gwas_sorted.tsv           ## sorting by column 8 in ascending order
 
-## Unique
+## 15. Cut - Extract columns
+## get example tab separated file
+wget https://raw.githubusercontent.com/caramirezal/dataScience/master/data/1000genomes_ann.tsv -P data
+cut -f2,3 data/1000genomes_ann.tsv                ## extracts column 2 and 3
 
-## cut
-
-
+## 16. Uniq - outputs only non repeated values
+cut -f3 data/1000genomes_ann.tsv | sort | unique
 
 #################################################################
 ##                                                             ##
-##                 Extra usefull commands                      ##
+##                 Extra useful commands                       ##
 ##                                                             ##
 #################################################################
 
-## 13. Untar files
+## 17. Untar files
 wget ftp://share.sph.umich.edu/minimac3/Minimac3.v2.0.1.tar.gz -P data
 tar -xvzf Minimac3.v2.0.1.tar.gz
 
-## 14. Display commands history log
+## 
+
+## 18. Display commands history log
 history 
 
 ## sets a variable
