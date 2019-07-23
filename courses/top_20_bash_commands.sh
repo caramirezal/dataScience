@@ -94,19 +94,35 @@ cut -f3 data/1000genomes_ann.tsv | sort | unique
 #################################################################
 
 ## 17. Untar files
-wget ftp://share.sph.umich.edu/minimac3/Minimac3.v2.0.1.tar.gz -P data
-tar -xvzf Minimac3.v2.0.1.tar.gz
+wget https://github.com/caramirezal/dataScience/blob/master/data/alignments.log.out.tar.gz -P data
+tar -xvzf alignements.log.out.tar.gz -C data/
 
-## 
+## 18. chmod - Change file permissions
+chmod +x scripts/script_example.sh
 
-## 18. Display commands history log
+## 19. Variable definition
+x='hola Mundo'; echo $x
+y=13;           echo $y
+files=data/alignment/*
+
+## 20. Iteration
+for i in files; do
+        echo $i
+        grep 'Uniquely mapped'
+done
+
+############################################################################
+##                                                                        ##
+##               Additional useful commands                               ##
+##                                                                        ##
+############################################################################
+
+## 21. history - display commands history log
 history 
 
-## sets a variable
+## 22. htop - list system resources
+htop
 
-## Sets an path environment
-
-## Iterate processes
 
 
 
