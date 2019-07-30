@@ -1,2 +1,2 @@
 # dataScience
-This project contains my personal projects and notes on data analysis 
+This repository contains scripts for mathematical modeling, machine learning, programming notes and data science courses.
