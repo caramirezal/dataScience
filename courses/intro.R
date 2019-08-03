@@ -69,3 +69,33 @@ fact1 <- factor(c('low', 'high', 'low', 'medium', 'low'))               ## Facto
 levels(fact1)                                                           ## showing factor levels
 fact.ord.lev <- factor(fact1, levels = c('low', 'medium', 'high'))      ## setting levels order
 fact.ord <- ordered(fact1, levels= c('low', 'medium', 'high'))          ## setting factor order
+
+## funtion definition
+my_first_function <- function(n1, n2){
+        res <- n1 + n2
+        return(res)
+}
+
+## Indentation is important for making codes human readable
+## NOTE: 8 spaces indenting and maximum of 80 is recommended for lines
+
+## Calling or invoking function
+my_first_function(3.1416, 10)
+
+
+## For Loop
+## Example: Summing up integers from 1 to 100
+s <- 0                                     ## initialize sum
+for (i in 1:100) {                         ## summing up
+        s <- s + i
+}
+s
+
+## While Loop - Same example
+n = 1                                     ## initialize iteration
+s = 0
+while (n <= 100) {
+        s = s + n                         ## update sum
+        n = n + 1                         ## increase integer
+}
+s
