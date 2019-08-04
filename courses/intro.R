@@ -31,7 +31,12 @@ x3*x4                        ## Multiplication
 x3**10; x3^10                ## Exponentiation
 sqrt(x3)                     ## squaring
 log10(x3)                    ## Logarithm base 10
-log(x3, base = 15)                  ## Logarithm base 15
+log(x3, base = 15)           ## Logarithm base 15
+l1 <- TRUE; l2 <- FALSE
+l1 & l2                      ## AND operation
+l1 | l2                      ## OR operation
+! l1                         ## NOT operation
+
 
 ## vector definition
 vec1 <- c(1, 2, 3)         ## concatenation of variables
@@ -57,12 +62,20 @@ prod(vec5)                            ## multiplication of all vector elements
 ## lists can contain different kinds of values
 ls1 <- list(1, TRUE, c('Hola, mundo', 'Adios'))                         ## List definition
 names(ls1) <- c('Xutos n Putapes', 'Voo Voo', 'Radio Futura')           ## Naming list
+ls1$'Voo Voo'                                                           ## show element
 
 ## list manipulation
 ls1[1] <- 'string to replace'                        ## Assigning values
 class(ls1[3])                                        ## extracting 3rd element as list
 class(ls1[[3]])                                      ## extracting 3rd element as vector
 ls1[c(1,3)]                                          ## subsetting
+
+s1 <- 'Hola'; s2 <- 'Mundo'
+## Strings operations
+paste(s1, s2, sep = ', ')                              ## paste two strings with a string separator
+grep(pattern = 'la', s1)                               ## find 'la' pattern in a string
+gsub(pattern = 'Mun', replacement = '-', s2)           ## replace 'Mun' string with '-'
+substr(s1, start = 3, stop = 5)                        ## extract string by index location
 
 ## Factors
 fact1 <- factor(c('low', 'high', 'low', 'medium', 'low'))               ## Factors definition
