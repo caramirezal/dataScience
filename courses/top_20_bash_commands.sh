@@ -94,8 +94,8 @@ cut -f3 data/1000genomes_ann.tsv | sort | unique
 #################################################################
 
 ## 17. Untar files
-wget https://github.com/caramirezal/dataScience/blob/master/data/alignments.log.out.tar.gz -P data
-tar -xvzf alignements.log.out.tar.gz -C data/
+wget https://github.com/caramirezal/dataScience/raw/master/data/alignements.tar.gz 
+tar -xvzf alignements.tar.gz 
 
 ## 18. chmod - Change file permissions
 chmod +x scripts/script_example.sh
