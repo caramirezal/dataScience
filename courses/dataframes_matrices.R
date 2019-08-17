@@ -1,8 +1,11 @@
 ## Data Science Course 
 ## Lecture 6. Dataframes and matrices
 
+setwd('~/sc/dataScience/courses/')
+
 ## Dependencies
 library(readxl)                             ## manage xlsx files
+library(dplyr)                              ## Handle dataframes
 
 ######################################################################
 ##                                                                  ##
@@ -10,19 +13,13 @@ library(readxl)                             ## manage xlsx files
 ##                                                                  ##
 ######################################################################
 
-## Pre-reading check
-sueldos <- read_excel('../data/8 LGT_Art_70_Fr_VIII_1er semestre_229363.xlsx',
-                      sheet = 'Información', 
-                      skip = 5, 
-                      n_max = 10)
-
-## Show structure of the dataframe
-str(sueldos)
-
-## Reading the whole table into R 
+## Reading dataframe example into R
+## See next chapter - Reading files into R
 sueldos <- read_excel('../data/8 LGT_Art_70_Fr_VIII_1er semestre_229363.xlsx',
                       sheet = 'Información', 
                       skip = 5)
+
+## Show structure of the dataframe
 str(sueldos)
 
 ## df table dimensions
@@ -42,23 +39,87 @@ sueldos[,10]                       ## extracting 10th column
 sueldos[,1:10]                     ## extracting first 10 columns
 sueldos[, c(2, 5, 10)]             ## extracting column 2, 5, 10
 
+## Extracting df rows
+sueldos[1:10, ]                    ## extracting first 10 rows
+
+## Filter df by conditions
+sueldos[sueldos$'SEXO (CATÁLOGO)' == 'Femenino', ]
+
+## Extracting df slides
+class(sueldos)
+
+## Casting values
+bruto <- sueldos$`MONTO DE LA REMUNERACIÓN BRUTA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA`
+bruto.num <- as.numeric(bruto)
+
+## NA values
+is.na(sueldos$`PRIMER APELLIDO`)      ## Non assigned values
+sum(is.na(sueldos$`PRIMER APELLIDO`))
+
+## Complete cases
+complete.cases(sueldos)
+
+## Operations with columns
+max(as.numeric(bruto))                         ## Maximum value in a column vector
+
+## Summary informations
 ## Frequency table
 table(gender)
 
-## Extracting df rows
+## Sorting tables
+order(bruto.num)                                              ## sort increasing
+indexes <- order(bruto.num, decreasing = TRUE)                ## sort decreasing
+sueldos[indexes, ]$`NOMBRE (S)`                               ## extract sorted column
 
-## Extracting df slides
+#############################################################################
+##                                                                         ##
+##                             loop functions                              ##
+##                                                                         ##
+#############################################################################
 
-## Casting values
-## NA values
-## Complete cases
+## apply by columns
+apply(sueldos, 2, class)                                     ## apply function by column
+apply(sueldos, 2, function(x) class(x))                      ## apply function by column
 
-## Operations with columns
-max(as.numeric(bruto))                         ## Maximun value in a column vector
+## extracting numerical values
+casted <- apply(sueldos, 2, 
+                function(x) as.numeric(x))                    ## casting columns as numeric
+num.cols <- apply(casted, 2, function(x) sum(is.na(x)) == 0)  ## get columns with no NA values
+                                                              ## probably, numerical cols
+sueldos.num <- sueldos[, num.cols]                            ## geeting numerical data
+sueldos.num <- apply(sueldos.num, 2, as.numeric)
+sueldos.n.df <- as.data.frame(sueldos.num)
 
-## Summary informations
+## apply by rows 
+apply(sueldos.n.df, 1, min)
 
-##
+## sapply
+sapply(sueldos.n.df, mean)
+
+## lapply
+lapply(sueldos.n.df, mean)
+
+## tapply
+tapply(bruto.num, sueldos$`SEXO (CATÁLOGO)`, mean)
+
+## mapply
+
+#######################################################################
+##                                                                   ##
+##                                  dplyr                            ##
+##                                                                   ##
+#######################################################################
+
+
+## select - sliding columns
+
+## filter - sliding rows
+
+## arrange
+
+
+
+
 
 
 
