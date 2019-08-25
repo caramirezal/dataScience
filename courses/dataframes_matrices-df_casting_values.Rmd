@@ -1,0 +1,69 @@
+---
+title: "Lecture 6. Dataframes and matrices - Casting values"
+output: html_document
+---
+
+
+Cast is the process of interpreting variables as having a particular class.
+
+Vectors can be casted or coerced to a specific class using the as.\*(), where \* represents the name of the class for the vector to be coerced. 
+
+Let's look at some examples:
+
+## Casting vectors
+
+We define a character vector as follows.
+
+```{r}
+x  <- c('10.5', '6', '5', '8', '5')
+x
+```
+
+We can cast to numerical.
+
+```{r}
+as.numeric(x)
+```
+Or to integers.
+
+```{r}
+as.integer(x)
+```
+
+You can see that 10.5 was rounded to an integer as expected.
+
+## Casting to logic
+
+As in C programming language, R interprets 0 as FALSE and any other number as TRUE.
+
+```{r}
+l = c(0, 1, 10.5)
+as.logical(l)
+```
+
+## Non-sense casting
+
+We have seen two examples where the values of the vector can be somewhat interpreted as the desired class. However, some values can not be casted unambigously as the next examples:
+
+```{r warning=FALSE}
+y <- c('3.1416', '0.999', '3M', '2,6')
+as.numeric(y)
+```
+
+The 3th vector entry referes to 3 million or 3 megabytes, the point is that R can not interpret it without ambiguity.
+
+NA represents non-assigned values. NA can not be used in algebraic operations and you should be cautious because it can leave to errors when performing calculations.
+
+```{r warning=FALSE}
+sum(as.numeric(y))
+```
+
+## Coercing during vector definition
+
+Note that the following vector is coerced to character which maybe is not what you expected. Be careful when defining vectors and remember that they contain only values of the same type.
+
+```{r}
+x <- c(0.9, 4.5, '3')
+x
+```
+
