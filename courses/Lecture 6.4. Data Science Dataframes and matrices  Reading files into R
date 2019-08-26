@@ -1,0 +1,525 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Reading data into R"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are many table formats (excel, csv, tsv) and R has routines to handle them. We will see some examples:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Reading csv files"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We will use transcriptomic processed data from single cell sequencing on hematopoyetic cells obtained by [Moignard et a, 2013.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3796878/). You can download the data in this [link](https://github.com/caramirezal/dataScience/raw/master/data/NIHMS53736-supplement-9.csv) by running the following commands."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "path <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/NIHMS53736-supplement-9.csv'\n",
+    "download.file(path, destfile = 'NIHMS53736-supplement-9.csv')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It is wiser to take a look at the content of the file reading the first 5 lines with the following function:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<ol class=list-inline>\n",
+       "\t<li>'Cell,Abl1,Eif2b1,Erg,Eto2,Fli1,Gata1,Gata2,Gfi1,Gfi1b,hHex,Kit,Ldb1,Lmo2,Lyl1,Meis1,Mitf,Mrpl19,Nfe2,Polr2a,PU.1,Runx1,SCL,Tel,Ubc'</li>\n",
+       "\t<li>'CLP001,18.67785665,16.45908053,19.64922993,19.24282794,15.91511026,40,40,40,40,40,17.86427959,16.6687136,18.18034087,15.45392736,18.19604561,40,17.98596964,17.52456271,16.92934759,18.01982127,15.36399254,22.64242864,18.03595375,13.59894954'</li>\n",
+       "\t<li>'CLP002,19.06803842,19.46232479,17.87173924,40,17.63498392,40,40,19.0067955,18.94411989,18.55724636,40,18.45649964,40,15.75510516,16.03342818,40,40,17.83527547,17.18276049,17.828451,17.37567811,40,18.65974217,15.11910773'</li>\n",
+       "\t<li>'CLP003,17.74280459,19.35602913,40,19.9412153,15.8862755,40,40,40,40,18.9479558,16.41380143,20.18975751,16.67008835,16.64862843,15.29526887,40,40,18.6316856,19.38497063,17.15092291,17.28261025,40,18.58234649,15.26649458'</li>\n",
+       "\t<li>'CLP004,18.11456154,18.76699657,18.4627356,23.59042153,16.57678149,40,40,19.24658663,19.45053383,17.75244362,18.16498919,18.1588825,16.79898195,16.96984099,17.45175802,40,17.82745754,17.89273818,18.28079858,17.50925911,15.87607195,40,18.02505758,14.74978151'</li>\n",
+       "</ol>\n"
+      ],
+      "text/latex": [
+       "\\begin{enumerate*}\n",
+       "\\item 'Cell,Abl1,Eif2b1,Erg,Eto2,Fli1,Gata1,Gata2,Gfi1,Gfi1b,hHex,Kit,Ldb1,Lmo2,Lyl1,Meis1,Mitf,Mrpl19,Nfe2,Polr2a,PU.1,Runx1,SCL,Tel,Ubc'\n",
+       "\\item 'CLP001,18.67785665,16.45908053,19.64922993,19.24282794,15.91511026,40,40,40,40,40,17.86427959,16.6687136,18.18034087,15.45392736,18.19604561,40,17.98596964,17.52456271,16.92934759,18.01982127,15.36399254,22.64242864,18.03595375,13.59894954'\n",
+       "\\item 'CLP002,19.06803842,19.46232479,17.87173924,40,17.63498392,40,40,19.0067955,18.94411989,18.55724636,40,18.45649964,40,15.75510516,16.03342818,40,40,17.83527547,17.18276049,17.828451,17.37567811,40,18.65974217,15.11910773'\n",
+       "\\item 'CLP003,17.74280459,19.35602913,40,19.9412153,15.8862755,40,40,40,40,18.9479558,16.41380143,20.18975751,16.67008835,16.64862843,15.29526887,40,40,18.6316856,19.38497063,17.15092291,17.28261025,40,18.58234649,15.26649458'\n",
+       "\\item 'CLP004,18.11456154,18.76699657,18.4627356,23.59042153,16.57678149,40,40,19.24658663,19.45053383,17.75244362,18.16498919,18.1588825,16.79898195,16.96984099,17.45175802,40,17.82745754,17.89273818,18.28079858,17.50925911,15.87607195,40,18.02505758,14.74978151'\n",
+       "\\end{enumerate*}\n"
+      ],
+      "text/markdown": [
+       "1. 'Cell,Abl1,Eif2b1,Erg,Eto2,Fli1,Gata1,Gata2,Gfi1,Gfi1b,hHex,Kit,Ldb1,Lmo2,Lyl1,Meis1,Mitf,Mrpl19,Nfe2,Polr2a,PU.1,Runx1,SCL,Tel,Ubc'\n",
+       "2. 'CLP001,18.67785665,16.45908053,19.64922993,19.24282794,15.91511026,40,40,40,40,40,17.86427959,16.6687136,18.18034087,15.45392736,18.19604561,40,17.98596964,17.52456271,16.92934759,18.01982127,15.36399254,22.64242864,18.03595375,13.59894954'\n",
+       "3. 'CLP002,19.06803842,19.46232479,17.87173924,40,17.63498392,40,40,19.0067955,18.94411989,18.55724636,40,18.45649964,40,15.75510516,16.03342818,40,40,17.83527547,17.18276049,17.828451,17.37567811,40,18.65974217,15.11910773'\n",
+       "4. 'CLP003,17.74280459,19.35602913,40,19.9412153,15.8862755,40,40,40,40,18.9479558,16.41380143,20.18975751,16.67008835,16.64862843,15.29526887,40,40,18.6316856,19.38497063,17.15092291,17.28261025,40,18.58234649,15.26649458'\n",
+       "5. 'CLP004,18.11456154,18.76699657,18.4627356,23.59042153,16.57678149,40,40,19.24658663,19.45053383,17.75244362,18.16498919,18.1588825,16.79898195,16.96984099,17.45175802,40,17.82745754,17.89273818,18.28079858,17.50925911,15.87607195,40,18.02505758,14.74978151'\n",
+       "\n",
+       "\n"
+      ],
+      "text/plain": [
+       "[1] \"Cell,Abl1,Eif2b1,Erg,Eto2,Fli1,Gata1,Gata2,Gfi1,Gfi1b,hHex,Kit,Ldb1,Lmo2,Lyl1,Meis1,Mitf,Mrpl19,Nfe2,Polr2a,PU.1,Runx1,SCL,Tel,Ubc\"                                                                                                                              \n",
+       "[2] \"CLP001,18.67785665,16.45908053,19.64922993,19.24282794,15.91511026,40,40,40,40,40,17.86427959,16.6687136,18.18034087,15.45392736,18.19604561,40,17.98596964,17.52456271,16.92934759,18.01982127,15.36399254,22.64242864,18.03595375,13.59894954\"                 \n",
+       "[3] \"CLP002,19.06803842,19.46232479,17.87173924,40,17.63498392,40,40,19.0067955,18.94411989,18.55724636,40,18.45649964,40,15.75510516,16.03342818,40,40,17.83527547,17.18276049,17.828451,17.37567811,40,18.65974217,15.11910773\"                                     \n",
+       "[4] \"CLP003,17.74280459,19.35602913,40,19.9412153,15.8862755,40,40,40,40,18.9479558,16.41380143,20.18975751,16.67008835,16.64862843,15.29526887,40,40,18.6316856,19.38497063,17.15092291,17.28261025,40,18.58234649,15.26649458\"                                      \n",
+       "[5] \"CLP004,18.11456154,18.76699657,18.4627356,23.59042153,16.57678149,40,40,19.24658663,19.45053383,17.75244362,18.16498919,18.1588825,16.79898195,16.96984099,17.45175802,40,17.82745754,17.89273818,18.28079858,17.50925911,15.87607195,40,18.02505758,14.74978151\""
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "readLines('NIHMS53736-supplement-9.csv', n = 5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Note that there are values separated by commas, you must think it as columns, hence its extension name .csv for comma separated files. \n",
+    "* The first line correspond to a header that has the variable names."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To get this csv data into R we can use the function read.csv()."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "transcripts <- read.csv('NIHMS53736-supplement-9.csv', \n",
+    "                        header = TRUE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The second parameter 'header' tells R that the first line contains the variable names when set to TRUE. The data has been readed into a dataframe called trascripts. Let's explore this dataframe:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "'data.frame'"
+      ],
+      "text/latex": [
+       "'data.frame'"
+      ],
+      "text/markdown": [
+       "'data.frame'"
+      ],
+      "text/plain": [
+       "[1] \"data.frame\""
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "class(transcripts)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<ol class=list-inline>\n",
+       "\t<li>620</li>\n",
+       "\t<li>25</li>\n",
+       "</ol>\n"
+      ],
+      "text/latex": [
+       "\\begin{enumerate*}\n",
+       "\\item 620\n",
+       "\\item 25\n",
+       "\\end{enumerate*}\n"
+      ],
+      "text/markdown": [
+       "1. 620\n",
+       "2. 25\n",
+       "\n",
+       "\n"
+      ],
+      "text/plain": [
+       "[1] 620  25"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "dim(transcripts)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "'data.frame':\t620 obs. of  25 variables:\n",
+      " $ Cell  : Factor w/ 620 levels \"CLP001\",\"CLP002\",..: 1 2 3 4 5 6 7 8 9 10 ...\n",
+      " $ Abl1  : num  18.7 19.1 17.7 18.1 19.6 ...\n",
+      " $ Eif2b1: num  16.5 19.5 19.4 18.8 17.5 ...\n",
+      " $ Erg   : num  19.6 17.9 40 18.5 17.2 ...\n",
+      " $ Eto2  : num  19.2 40 19.9 23.6 20.4 ...\n",
+      " $ Fli1  : num  15.9 17.6 15.9 16.6 15.7 ...\n",
+      " $ Gata1 : num  40 40 40 40 40 40 40 40 40 40 ...\n",
+      " $ Gata2 : num  40 40 40 40 40 40 40 40 40 40 ...\n",
+      " $ Gfi1  : num  40 19 40 19.2 40 ...\n",
+      " $ Gfi1b : num  40 18.9 40 19.5 17 ...\n",
+      " $ hHex  : num  40 18.6 18.9 17.8 18.5 ...\n",
+      " $ Kit   : num  17.9 40 16.4 18.2 17.6 ...\n",
+      " $ Ldb1  : num  16.7 18.5 20.2 18.2 20.7 ...\n",
+      " $ Lmo2  : num  18.2 40 16.7 16.8 17 ...\n",
+      " $ Lyl1  : num  15.5 15.8 16.6 17 15.8 ...\n",
+      " $ Meis1 : num  18.2 16 15.3 17.5 16.8 ...\n",
+      " $ Mitf  : num  40 40 40 40 40 ...\n",
+      " $ Mrpl19: num  18 40 40 17.8 22.7 ...\n",
+      " $ Nfe2  : num  17.5 17.8 18.6 17.9 19.5 ...\n",
+      " $ Polr2a: num  16.9 17.2 19.4 18.3 18.4 ...\n",
+      " $ PU.1  : num  18 17.8 17.2 17.5 17.4 ...\n",
+      " $ Runx1 : num  15.4 17.4 17.3 15.9 17.2 ...\n",
+      " $ SCL   : num  22.6 40 40 40 19.2 ...\n",
+      " $ Tel   : num  18 18.7 18.6 18 17.7 ...\n",
+      " $ Ubc   : num  13.6 15.1 15.3 14.7 14.2 ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "str(transcripts)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## read.table() function"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In general, any character symbol can be used instead of commas to define a tabular array. Tab separated and space separated formats are also frequent. We can use the read.table() in order to specify the type of separator. Let's download the sueldos data from CONACYT as before, in this time we will name the file sueldos_CONACYT.tsv. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "path <- 'https://github.com/caramirezal/dataScience/raw/master/data/8%20LGT_Art_70_Fr_VIII_1er%20semestre_229363.tsv'\n",
+    "download.file(path, \"sueldos_CONACYT.tsv\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As you can see the sueldos data contains metadata (information explaining what the data is about) in the first 5 lines. We will use the following new parameters:\n",
+    "\n",
+    "* sep - define the column separator, in this case case represented by '\\t'.\n",
+    "\n",
+    "* skip - to ignore the first 5 lines.\n",
+    "\n",
+    "* stringAsFactors - this is optional, when set to TRUE or default character columns are read as Factors. Here we want to control class assignation and hence we set to FALSE.\n",
+    "\n",
+    "* quote - tells R the set of quotes to define strings. If set to \"\" indicates do not interpret text between quotes as strings. \n",
+    "\n",
+    "NOTE: Setting quote = \"\" can avoid many errors during loading table formats."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sueldos <- read.table(path,\n",
+    "                      sep='\\t',\n",
+    "                      skip = 5,\n",
+    "                      quote = \"\",\n",
+    "                      stringsAsFactors = FALSE,\n",
+    "                      header = TRUE)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can see the suelods loaded into R."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "'data.frame':\t4014 obs. of  36 variables:\n",
+      " $ ID                                                                                                     : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ FECHA.CREACION                                                                                         : chr  \"04/29/19\" \"04/29/19\" \"04/29/19\" \"04/29/19\" ...\n",
+      " $ FECHA.MODIFICACION                                                                                     : chr  \"04/29/19\" \"04/29/19\" \"04/29/19\" \"04/29/19\" ...\n",
+      " $ EJERCICIO                                                                                              : int  2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 ...\n",
+      " $ FECHA.DE.INICIO.DEL.PERIODO.QUE.SE.INFORMA                                                             : chr  \"01/01/19\" \"01/01/19\" \"01/01/19\" \"01/01/19\" ...\n",
+      " $ FECHA.DE.TÉRMINO.DEL.PERIODO.QUE.SE.INFORMA                                                            : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ TIPO.DE.INTEGRANTE.DEL.SUJETO.OBLIGADO..CATÁLOGO.                                                      : chr  \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" ...\n",
+      " $ CLAVE.O.NIVEL.DEL.PUESTO                                                                               : chr  \"6\" \"6\" \"6\" \"6\" ...\n",
+      " $ DENOMINACIÓN.O.DESCRIPCIÓN.DEL.PUESTO                                                                  : chr  \"SECRETARIA EJECUTIVA\" \"SECRETARIA EJECUTIVA\" \"TÉCNICO ESPECIALISTA EN SERVICIOS DE MANTENIMIENTO\" \"SECRETARIA EJECUTIVA\" ...\n",
+      " $ DENOMINACIÓN.DEL.CARGO                                                                                 : chr  \"SECRETARIA EJECUTIVA\" \"SECRETARIA EJECUTIVA\" \"TÉCNICO ESPECIALISTA EN SERVICIOS DE MANTENIMIENTO\" \"SECRETARIA EJECUTIVA\" ...\n",
+      " $ ÁREA.DE.ADSCRIPCIÓN                                                                                    : chr  \"OFICIALÍA MAYOR\" \"DIRECCIÓN ADJUNTA DE DESARROLLO CIENTÍFICO\" \"DIRECCIÓN ADJUNTA DE DESARROLLO CIENTÍFICO\" \"DIRECCIÓN ADJUNTA DE DESARROLLO TECNOLÓGICO E INNOVACIÓN\" ...\n",
+      " $ NOMBRE..S.                                                                                             : chr  \"YESSICA\" \"GERARDO\" \"JOSE ALFONSO\" \"GABRIELA\" ...\n",
+      " $ PRIMER.APELLIDO                                                                                        : chr  \"DIAZ\" \"DIAZ GONZALEZ\" \"DUEÑAS\" \"ESPINOSA\" ...\n",
+      " $ SEGUNDO.APELLIDO                                                                                       : chr  \"ROMERO\" \"MARMOLEJO\" \"SANTIAGO\" \"GONZALEZ\" ...\n",
+      " $ SEXO..CATÁLOGO.                                                                                        : chr  \"Femenino\" \"Masculino\" \"Masculino\" \"Femenino\" ...\n",
+      " $ MONTO.DE.LA.REMUNERACIÓN.BRUTA..DE.CONFORMIDAD.AL.TABULADOR.DE.SUELDOS.Y.SALARIOS.QUE.CORRESPONDA      : num  8145 8145 8145 8145 8145 ...\n",
+      " $ TIPO.DE.MONEDA.DE.LA.REMUNERACIÓN.BRUTA                                                                : chr  \"Pesos\" \"Pesos\" \"Pesos\" \"Pesos\" ...\n",
+      " $ MONTO.DE.LA.REMUNERACIÓN.NETA..DE.CONFORMIDAD.AL.TABULADOR.DE.SUELDOS.Y.SALARIOS.QUE.CORRESPONDA       : num  6625 6625 6625 6625 6625 ...\n",
+      " $ TIPO.DE.MONEDA.DE.LA.REMUNERACIÓN.NETA                                                                 : chr  \"Pesos\" \"Pesos\" \"Pesos\" \"Pesos\" ...\n",
+      " $ PERCEPCIONES.ADICIONALES.EN.DINERO..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333781.: int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ PERCEPCIONES.ADICIONALES.EN.ESPECIE.Y.SU.PERIODICIDAD..Tabla_333767.                                   : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ INGRESOS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333782.                          : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ SISTEMAS.DE.COMPENSACIÓN..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333751.          : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ GRATIFICACIONES..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333771.                   : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ PRIMAS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333758.                            : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ COMISIONES..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333768.                        : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ DIETAS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333759.                            : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ BONOS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333760.                             : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ ESTÍMULOS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333779.                         : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ APOYOS.ECONÓMICOS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333783.                 : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ PRESTACIONES.ECONÓMICAS..MONTO.BRUTO.Y.NETO..TIPO.DE.MONEDA.Y.SU.PERIODICIDAD..Tabla_333780.           : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ PRESTACIONES.EN.ESPECIE.Y.SU.PERIODICIDAD..Tabla_333784.                                               : int  486629613 486629614 486629615 486629616 486629617 486629693 486629694 486629695 486629696 486629697 ...\n",
+      " $ ÁREA.S..RESPONSABLE.S..QUE.GENERA.N...POSEE.N...PUBLICA.N..Y.ACTUALIZAN.LA.INFORMACIÓN                 : chr  \"Oficialía Mayor\" \"Oficialía Mayor\" \"Oficialía Mayor\" \"Oficialía Mayor\" ...\n",
+      " $ FECHA.DE.VALIDACIÓN                                                                                    : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ FECHA.DE.ACTUALIZACIÓN                                                                                 : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ NOTA                                                                                                   : chr  \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "str(sueldos)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## readr Library"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The readr library is useful when loading big tables since performs faster. You can consult the readr documentation [here](https://www.rdocumentation.org/packages/readr/versions/1.3.1)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Parsed with column specification:\n",
+      "cols(\n",
+      "  .default = col_character(),\n",
+      "  ID = \u001b[32mcol_double()\u001b[39m,\n",
+      "  EJERCICIO = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `MONTO DE LA REMUNERACIÓN BRUTA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `MONTO DE LA REMUNERACIÓN NETA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `PERCEPCIONES ADICIONALES EN DINERO  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333781)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `PERCEPCIONES ADICIONALES EN ESPECIE Y SU PERIODICIDAD (Tabla_333767)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `INGRESOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333782)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `SISTEMAS DE COMPENSACIÓN  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333751)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `GRATIFICACIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333771)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `PRIMAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333758)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `COMISIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333768)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `DIETAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333759)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `BONOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333760)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `ESTÍMULOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333779)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `APOYOS ECONÓMICOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333783)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `PRESTACIONES ECONÓMICAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333780)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  `PRESTACIONES EN ESPECIE Y SU PERIODICIDAD (Tabla_333784)` = \u001b[32mcol_double()\u001b[39m\n",
+      ")\n",
+      "See spec(...) for full column specifications.\n"
+     ]
+    }
+   ],
+   "source": [
+    "library(readr)\n",
+    "sueldos <- read_tsv(path,\n",
+    "                    skip = 5,\n",
+    "                    quote = \"\",\n",
+    "                    col_names = TRUE)           ## col_names is equivalent to header in read.table"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's inspect the loaded data. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Classes ‘spec_tbl_df’, ‘tbl_df’, ‘tbl’ and 'data.frame':\t4014 obs. of  36 variables:\n",
+      " $ ID                                                                                                     : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ FECHA CREACION                                                                                         : chr  \"04/29/19\" \"04/29/19\" \"04/29/19\" \"04/29/19\" ...\n",
+      " $ FECHA MODIFICACION                                                                                     : chr  \"04/29/19\" \"04/29/19\" \"04/29/19\" \"04/29/19\" ...\n",
+      " $ EJERCICIO                                                                                              : num  2019 2019 2019 2019 2019 ...\n",
+      " $ FECHA DE INICIO DEL PERIODO QUE SE INFORMA                                                             : chr  \"01/01/19\" \"01/01/19\" \"01/01/19\" \"01/01/19\" ...\n",
+      " $ FECHA DE TÉRMINO DEL PERIODO QUE SE INFORMA                                                            : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ TIPO DE INTEGRANTE DEL SUJETO OBLIGADO (CATÁLOGO)                                                      : chr  \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" \"Servidor(a) público(a)\" ...\n",
+      " $ CLAVE O NIVEL DEL PUESTO                                                                               : chr  \"6\" \"6\" \"6\" \"6\" ...\n",
+      " $ DENOMINACIÓN O DESCRIPCIÓN DEL PUESTO                                                                  : chr  \"SECRETARIA EJECUTIVA\" \"SECRETARIA EJECUTIVA\" \"TÉCNICO ESPECIALISTA EN SERVICIOS DE MANTENIMIENTO\" \"SECRETARIA EJECUTIVA\" ...\n",
+      " $ DENOMINACIÓN DEL CARGO                                                                                 : chr  \"SECRETARIA EJECUTIVA\" \"SECRETARIA EJECUTIVA\" \"TÉCNICO ESPECIALISTA EN SERVICIOS DE MANTENIMIENTO\" \"SECRETARIA EJECUTIVA\" ...\n",
+      " $ ÁREA DE ADSCRIPCIÓN                                                                                    : chr  \"OFICIALÍA MAYOR\" \"DIRECCIÓN ADJUNTA DE DESARROLLO CIENTÍFICO\" \"DIRECCIÓN ADJUNTA DE DESARROLLO CIENTÍFICO\" \"DIRECCIÓN ADJUNTA DE DESARROLLO TECNOLÓGICO E INNOVACIÓN\" ...\n",
+      " $ NOMBRE (S)                                                                                             : chr  \"YESSICA\" \"GERARDO\" \"JOSE ALFONSO\" \"GABRIELA\" ...\n",
+      " $ PRIMER APELLIDO                                                                                        : chr  \"DIAZ\" \"DIAZ GONZALEZ\" \"DUEÑAS\" \"ESPINOSA\" ...\n",
+      " $ SEGUNDO APELLIDO                                                                                       : chr  \"ROMERO\" \"MARMOLEJO\" \"SANTIAGO\" \"GONZALEZ\" ...\n",
+      " $ SEXO (CATÁLOGO)                                                                                        : chr  \"Femenino\" \"Masculino\" \"Masculino\" \"Femenino\" ...\n",
+      " $ MONTO DE LA REMUNERACIÓN BRUTA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA      : num  8145 8145 8145 8145 8145 ...\n",
+      " $ TIPO DE MONEDA DE LA REMUNERACIÓN BRUTA                                                                : chr  \"Pesos\" \"Pesos\" \"Pesos\" \"Pesos\" ...\n",
+      " $ MONTO DE LA REMUNERACIÓN NETA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA       : num  6625 6625 6625 6625 6625 ...\n",
+      " $ TIPO DE MONEDA DE LA REMUNERACIÓN NETA                                                                 : chr  \"Pesos\" \"Pesos\" \"Pesos\" \"Pesos\" ...\n",
+      " $ PERCEPCIONES ADICIONALES EN DINERO  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333781): num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ PERCEPCIONES ADICIONALES EN ESPECIE Y SU PERIODICIDAD (Tabla_333767)                                   : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ INGRESOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333782)                          : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ SISTEMAS DE COMPENSACIÓN  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333751)          : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ GRATIFICACIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333771)                   : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ PRIMAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333758)                            : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ COMISIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333768)                        : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ DIETAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333759)                            : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ BONOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333760)                             : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ ESTÍMULOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333779)                         : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ APOYOS ECONÓMICOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333783)                 : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ PRESTACIONES ECONÓMICAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333780)           : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ PRESTACIONES EN ESPECIE Y SU PERIODICIDAD (Tabla_333784)                                               : num  4.87e+08 4.87e+08 4.87e+08 4.87e+08 4.87e+08 ...\n",
+      " $ ÁREA(S) RESPONSABLE(S) QUE GENERA(N)  POSEE(N)  PUBLICA(N) Y ACTUALIZAN LA INFORMACIÓN                 : chr  \"Oficialía Mayor\" \"Oficialía Mayor\" \"Oficialía Mayor\" \"Oficialía Mayor\" ...\n",
+      " $ FECHA DE VALIDACIÓN                                                                                    : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ FECHA DE ACTUALIZACIÓN                                                                                 : chr  \"03/31/19\" \"03/31/19\" \"03/31/19\" \"03/31/19\" ...\n",
+      " $ NOTA                                                                                                   : chr  \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ \"Los conceptos de Percepciones adicionales en dinero, Percepciones adicionales en especie, Ingresos , Sistemas d\"| __truncated__ ...\n",
+      " - attr(*, \"spec\")=\n",
+      "  .. cols(\n",
+      "  ..   ID = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `FECHA CREACION` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `FECHA MODIFICACION` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   EJERCICIO = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `FECHA DE INICIO DEL PERIODO QUE SE INFORMA` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `FECHA DE TÉRMINO DEL PERIODO QUE SE INFORMA` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `TIPO DE INTEGRANTE DEL SUJETO OBLIGADO (CATÁLOGO)` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `CLAVE O NIVEL DEL PUESTO` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `DENOMINACIÓN O DESCRIPCIÓN DEL PUESTO` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `DENOMINACIÓN DEL CARGO` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `ÁREA DE ADSCRIPCIÓN` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `NOMBRE (S)` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `PRIMER APELLIDO` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `SEGUNDO APELLIDO` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `SEXO (CATÁLOGO)` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `MONTO DE LA REMUNERACIÓN BRUTA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `TIPO DE MONEDA DE LA REMUNERACIÓN BRUTA` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `MONTO DE LA REMUNERACIÓN NETA  DE CONFORMIDAD AL TABULADOR DE SUELDOS Y SALARIOS QUE CORRESPONDA` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `TIPO DE MONEDA DE LA REMUNERACIÓN NETA` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `PERCEPCIONES ADICIONALES EN DINERO  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333781)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `PERCEPCIONES ADICIONALES EN ESPECIE Y SU PERIODICIDAD (Tabla_333767)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `INGRESOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333782)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `SISTEMAS DE COMPENSACIÓN  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333751)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `GRATIFICACIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333771)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `PRIMAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333758)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `COMISIONES  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333768)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `DIETAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333759)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `BONOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333760)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `ESTÍMULOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333779)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `APOYOS ECONÓMICOS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333783)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `PRESTACIONES ECONÓMICAS  MONTO BRUTO Y NETO  TIPO DE MONEDA Y SU PERIODICIDAD (Tabla_333780)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `PRESTACIONES EN ESPECIE Y SU PERIODICIDAD (Tabla_333784)` = \u001b[32mcol_double()\u001b[39m,\n",
+      "  ..   `ÁREA(S) RESPONSABLE(S) QUE GENERA(N)  POSEE(N)  PUBLICA(N) Y ACTUALIZAN LA INFORMACIÓN` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `FECHA DE VALIDACIÓN` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   `FECHA DE ACTUALIZACIÓN` = \u001b[31mcol_character()\u001b[39m,\n",
+      "  ..   NOTA = \u001b[31mcol_character()\u001b[39m\n",
+      "  .. )\n"
+     ]
+    }
+   ],
+   "source": [
+    "str(sueldos)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "R",
+   "language": "R",
+   "name": "ir"
+  },
+  "language_info": {
+   "codemirror_mode": "r",
+   "file_extension": ".r",
+   "mimetype": "text/x-r-source",
+   "name": "R",
+   "pygments_lexer": "r",
+   "version": "3.6.1"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
