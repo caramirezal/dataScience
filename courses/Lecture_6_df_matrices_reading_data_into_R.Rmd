@@ -1,0 +1,105 @@
+---
+title: "Lecture 6 Dataframes and matrices - Reading data into R"
+output: html_document
+---
+
+
+# **Reading data into R**
+
+There are many table formats (excel, csv, tsv) and R has routines to handle them. We will see some examples:
+
+## Reading csv files
+
+We will use transcriptomic processed data from single cell sequencing on hematopoyetic cells obtained by Moignard et a, 2013. You can download the data in this link by running the following commands.
+
+```{r}
+path <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/NIHMS53736-supplement-9.csv'
+download.file(path, destfile = 'NIHMS53736-supplement-9.csv')
+```
+
+It is wiser to take a look at the content of the file reading the first 5 lines with the following function:
+
+```{r}
+readLines('NIHMS53736-supplement-9.csv', n = 5)
+```
+
+
+* Note that there are values separated by commas, you must think it as columns, hence its extension name .csv for comma separated files. 
+
+* The first line correspond to a header that has the variable names.
+
+To get this csv data into R we can use the function read.csv().
+
+```{r}
+transcripts <- read.csv('NIHMS53736-supplement-9.csv', 
+                        header = TRUE)
+```
+
+The second parameter 'header' tells R that the first line contains the variable names when set to TRUE. The data has been readed into a dataframe called trascripts. Let's explore this dataframe:
+
+```{r}
+class(transcripts)
+```
+
+```{r}
+dim(transcripts)
+```
+
+```{r}
+str(transcripts)
+```
+
+## read.table() function
+
+In general, any character symbol can be used instead of commas to define a tabular array. Tab separated and space separated formats are also frequent. We can use the read.table() in order to specify the type of separator. Let's download the sueldos data from CONACYT as before, in this time we will name the file sueldos_CONACYT.tsv.
+
+```{r}
+ath <- 'https://github.com/caramirezal/dataScience/raw/master/data/8%20LGT_Art_70_Fr_VIII_1er%20semestre_229363.tsv'
+download.file(path, "sueldos_CONACYT.tsv")
+```
+
+As you can see the sueldos data contains metadata (information explaining what the data is about) in the first 5 lines. We will use the following new parameters:
+
+* sep - define the column separator, in this case case represented by '\t'.
+
+* skip - to ignore the first 5 lines.
+
+* stringAsFactors - this is optional, when set to TRUE or default character columns are read as Factors. Here we want to control class assignation and hence we set to FALSE.
+
+* quote - tells R the set of quotes to define strings. If set to "" indicates do not interpret text between quotes as strings. 
+
+NOTE: Setting quote = "" can avoid many errors during loading table formats.
+
+```{r}
+sueldos <- read.table(path,
+                      sep='\t',
+                      skip = 5,
+                      quote = "",
+                      stringsAsFactors = FALSE,
+                      header = TRUE)
+```
+
+Now we can see the suelods loaded into R.
+
+```{r}
+str(sueldos)
+```
+
+## readr Library
+
+The readr library is useful when loading big tables since performs faster. You can consult the readr documentation here.
+
+```{r message=FALSE}
+library(readr)
+sueldos <- read_tsv(path,
+                    skip = 5,
+                    quote = "",
+                    col_names = TRUE)           ## col_names is equivalent to header in read.table
+```
+
+Let's inspect the loaded data.
+
+```{r}
+str(sueldos)
+```
+
