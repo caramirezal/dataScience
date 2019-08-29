@@ -1,0 +1,111 @@
+---
+title: "Lectura 6. Dataframes and matrices - Apply functions"
+output: html_document
+---
+
+Apply functions are simplified versions of iterating over arrays. They can substitute For and while loops. When looping functions where added to R language they were enhanced versions of classic **For** and **While** operations, however, at the present classic iterators and looping functions use the same algorithms for looping.
+
+Advantages over loops
+
+* They provide more compact and readable syntaxis.
+
+Limitations
+
+* Sometimes, when implementing complex functions maybe a classic loop can be more readable and simple.
+
+## sapply()
+
+Let's load the single cell rna-seq data example from Moignard et al, 2013. 
+
+
+```{r}
+path <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/NIHMS53736-supplement-9.csv'
+transcripts <- read.csv(path, 
+                        header = TRUE)
+```
+
+We will select only numerical values.
+
+```{r}
+transcriptsNum <- transcripts[, 2:ncol(transcripts)]
+str(transcriptsNum)
+```
+
+Let's calculate the mean expression values for each gene (stored in columns) and store the results in a vector.
+
+```{r}
+means <- vector('numeric', ncol(transcriptsNum))   ## creating a vector to store results
+for (i in 1:ncol(transcriptsNum)) {
+        means[i] <- mean(transcriptsNum[,i])
+}
+means        
+```
+
+We can perform the same calculation with sapply().
+
+```{r}
+meansSapply <- sapply(transcriptsNum, mean)
+meansSapply
+```
+
+*sapply()* takes as first parameter an array of elements and performs a given function. In our previous example, the array is a dataframe and the function is mean().
+
+IMPORTANT: Remember, that a dataframe can be though as a list that contains vectors (of columns, of course with values of the same class). That's the reason why sapply iterates over columns.
+
+We can pass *additional parameters* to the function as follows. We will pass the *na.rm* set to true to the *mean()* function.
+
+```{r}
+meansSapply <- sapply(transcriptsNum, mean, na.rm=TRUE)
+head(meansSapply)
+```
+
+## lapply()
+
+The important difference between *sapply()* and *lapply()* is the output. As opposed to *sapply()*, the output of lapply is a **list**. 
+
+
+```{r}
+meanslapply <- lapply(transcriptsNum, mean)
+head(meanslapply)
+```
+
+## apply()
+
+The *apply()* function performs iterations over the margins of an array. In a tabular array margin 1 indicates the rows and margin 2 represents columns.
+
+Let's calculate the mean values by sample (row=margin 1) and by gene (column=margin 2).
+
+By rows.
+
+```{r}
+meanByColumn <- apply(transcriptsNum, 1, mean)
+head(meanByColumn)
+```
+By columns.
+
+```{r}
+meanByColumn <- apply(transcriptsNum, 2, mean)
+head(meanByColumn)
+```
+
+## Customized functions
+
+We can define customized functions by using the *function* parameter in looping functions. 
+
+Let's suppose we want to normalize the gene expression values of the column X using the following formula:
+
+$$ Z_i = X_i - min(X) / max(X) - min(X) $$
+
+```{r}
+transcriptsNorm <- sapply(transcriptsNum, 
+                          function(x) ( x - min(x) ) / ( max(x) - min(x) ) )
+```
+
+Notice that we defined a temporal variable on the flight, called x, which will represent the elements of the array provided to the apply function being traversed. 
+
+As you can see, now the expression values are numbers in the interval $[0,1]$
+
+```{r}
+head(transcriptsNorm[, 1:5])
+```
+
