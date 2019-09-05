@@ -1,0 +1,50 @@
+---
+title: "Lecture 6.7. String Patterns"
+author: "Carlos Ramirez Alvarez"
+date: "9/5/2019"
+output: html_document
+---
+
+# String patterns
+
+Pattern searching is concerning with matching string characters in large bulks of text.
+
+There are two main types of string matching:
+
+* Exact match -  very similar to Ctrl+F function in text editors.
+
+* Regular expressions -  consider the following phrase.
+
+L@ Sen0R1tA carA de pizZ@
+
+If you've got the symbolic message regardless the strange appearence you have the intuitive idea of pattern matching which in essence is a flexible macthing. 
+
+String pattern matching is especially useful for data mining algorithms. Suppose that we want to search all reports available in PubMed where gen PU.1 is mentioned and extract genes that could interact with it. Well, PU.1 can be found referred as PU1, pu1, pu.1, etc.. One option is to generate multiple searches for every posible variation in gene names including synonyms. Another option is to flexibilize our string matching.
+
+## Exact match
+
+Let's load all the words in the spanish dictionary to play with patterns. They can be found at Javier Arce Github repository.
+
+```{r}
+diccionario <- readLines('https://raw.githubusercontent.com/javierarce/palabras/master/listado-general.txt')
+length(diccionario)
+```
+
+I'm specially interested in the distribution of words that uses the combination of letters 'ch'. Remember the function grep used to match character strings.
+
+There are two flavours of grep that differs in the type of the output. All of these functions perform string matching.
+
+* grepl - returns TRUE if there is a match and FALSE, otherwise.
+
+* grep - return indexes. If parameter value = TRUE returns the matched string.
+
+```{r}
+head(grep('ch', diccionario, value = TRUE))
+length(grep('ch', diccionario, value = TRUE))
+```
+
+There are 3,891 words with ch.
+
+
+[Regular expressions as used in R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).
+
