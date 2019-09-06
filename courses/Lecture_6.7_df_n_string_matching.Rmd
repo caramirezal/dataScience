@@ -1,9 +1,13 @@
 ---
-title: "Lecture 6.7. String Patterns"
+title: "Lecture 7.1. Graphical visualization - String Patterns"
 author: "Carlos Ramirez Alvarez"
 date: "9/5/2019"
 output: html_document
 ---
+
+```{r echo=FALSE}
+setwd('~/sc/dataScience/courses/')
+```
 
 # String patterns
 
@@ -13,30 +17,40 @@ There are two main types of string matching:
 
 * Exact match -  very similar to Ctrl+F function in text editors.
 
-* Regular expressions -  consider the following phrase.
+* Regular expressions -  flexible matching. 
 
-L@ Sen0R1tA carA de pizZ@
-
-If you've got the symbolic message regardless the strange appearence you have the intuitive idea of pattern matching which in essence is a flexible macthing. 
-
-String pattern matching is especially useful for data mining algorithms. Suppose that we want to search all reports available in PubMed where gen PU.1 is mentioned and extract genes that could interact with it. Well, PU.1 can be found referred as PU1, pu1, pu.1, etc.. One option is to generate multiple searches for every posible variation in gene names including synonyms. Another option is to flexibilize our string matching.
-
-## Exact match
+# Spanish dictionary example
 
 Let's load all the words in the spanish dictionary to play with patterns. They can be found at Javier Arce Github repository.
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 diccionario <- readLines('https://raw.githubusercontent.com/javierarce/palabras/master/listado-general.txt')
 length(diccionario)
 ```
 
-I'm specially interested in the distribution of words that uses the combination of letters 'ch'. Remember the function grep used to match character strings.
+This spanish dictionary has 80,383 words.
+
+# grep()
+
+Remember that function grep is used to match a pattern in character strings.
 
 There are two flavours of grep that differs in the type of the output. All of these functions perform string matching.
 
-* grepl - returns TRUE if there is a match and FALSE, otherwise.
+* grepl - returns TRUE if there is a match and FALSE otherwise.
 
-* grep - return indexes. If parameter value = TRUE returns the matched string.
+* grep - return indexes. If parameter value = TRUE returns the matched strings.
+
+Grep function accepts the following parameters:
+
+* A pattern -  which is a single character string.
+
+* Target strings - A vector or strings where the pattern is looked at.
+
+I'm specially interested in the distribution of words that uses the combination of letters 'ch'. 
+
+# Exact match
+
+## grep('ch') - Matching all strings matching ch exactly. 
 
 ```{r}
 head(grep('ch', diccionario, value = TRUE))
@@ -45,6 +59,163 @@ length(grep('ch', diccionario, value = TRUE))
 
 There are 3,891 words with ch.
 
+# Regular expressions
 
-[Regular expressions as used in R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).
+Consider the following phrase.
+
+L@ Sen0R1tA carA de pizZ@
+
+If you've got the symbolic message regardless the strange appearence in some characters you have the intuitive idea of pattern matching which in essence is a flexible matching. 
+
+String pattern matching is especially useful for data mining algorithms. Suppose that we want to search all reports available in PubMed where PU.1 transcription factor is mentioned and extract genes that could interact with it. Well, PU.1 can be found referred as PU1, pu1, pu.1, etc.. One option is to generate multiple searches for every posible variation in gene names including synonyms. Another option is to flexibilize our string matching.
+
+Regular expressions are sets of symbols that instructs flexible matching. We will revise them with examples.
+
+## grep('^ch') - Finding all strings starting with ch. 
+
+You can see the patterns behaviour by simply inspecting the outputs of grep(value=TRUE).
+
+```{r}
+head(
+        grep('^ch', diccionario, value = TRUE)
+)
+```
+
+## grep('ch$') - Words ending with ch.
+
+```{r}
+head(
+        grep('ch$', diccionario, value = TRUE)
+)
+```
+
+## grep('ch[ae]' - Words having cha or che.
+
+Brackets [] - referes to single characters.
+
+```{r}
+head(
+        grep('ch[ae]', diccionario, value = TRUE)
+)
+```
+
+Think characters inside [] as a list of possible characters to match.
+
+## grep('ch[^a]' - Words with ch NOT followed by an 'a'.
+
+Caret symbol ^ - Inside brackets means NOT. **Remember this**.
+
+```{r}
+head(
+        grep('ch[^a]', diccionario, value = TRUE)
+)
+```
+
+## grep('cha(.)cha') - A word having *any character*  between cha and cha. 
+
+```{r}
+head(
+        grep('cha(.)cha', diccionario, value = TRUE)
+)
+```
+
+## grep('cha(\*.)cha') - A word having *any character repeated multiple times*  between cha and cha. 
+
+Parenthesis () - Represents groups of characters.
+
+```{r}
+head(
+        grep('cha(*.)cha', diccionario, value = TRUE)
+)
+```
+
+## grep('(chan|chal)') - Matching chan OR chal.
+
+Pipe symbol \| - defines matching two patterns in a similar way to OR logic operator.
+
+```{r}
+head(
+        grep('(chan|chal)', diccionario, value = TRUE)
+)
+```
+
+
+## grep('(cha){2}) - Repeated cha at least two times.
+
+```{r}
+head(
+        grep('(cha){2}', diccionario, value = TRUE)
+)
+```
+
+## grep('lista[s]?') - Matching s character optionally.
+
+Suppose we want to match a word allowing for plural use, for example, matching 'lista' or 'listas'.
+
+Interrogation symbol \? - defines a possible pattern.
+
+```{r}
+head(
+        grep('lista[s]?', c('lista', 'listas'), value = TRUE)
+)
+```
+
+# Tokens
+
+Suppose that we want to match strings having a point '.' symbol.
+
+```{r}
+grep('.', c('This is an end line.', 'this string has not point'), value = TRUE)
+```
+
+This is not the result that we expect!
+
+Remember that '.' means any character and that explains the previous output.
+
+In order to instruct grep to recognize the character '.' literally we most use the prefix double backslash \\ as follows. 
+
+```{r}
+grep('\\.', c('This is an end line.', 'this string has not point'), value = TRUE)
+```
+
+This is the result that we wanted. All the characters with special means such as $, ., ^, ? are also known as tokens. In order to use tokens in a literally manner they most be preceded by \\. This process is also known as character escaping. 
+
+
+# Real life applications
+
+## grep('[Pp][Uu](.)?1') - Matching PU.1 synonyms.
+
+The pattern '[Pp][Uu](.)?1' can be used to match different forms of finding PU.1 in reports.
+
+
+```{r}
+pu1 <- c('pu.1', 'pu1', 'PU.1', 'PU1', 'Pu1')
+grep('[Pp][Uu](.)?1', pu1, value = TRUE)
+```
+
+
+## Removing characters using gsub.
+
+gsub(',', '') - Removing annoying commas in order to cast to numeric.
+
+```{r}
+gsub(',', '', c('3,000', '1,500'))
+```
+
+gsub('[^[:digit:]]') - Removing annoying non numeric symbols in a vector.
+
+[:digit:] - represents digits or numbers and is equivalent to [0-9].
+
+```{r}
+gsub('[^[:digit:]]', '', c('30 00', '1,500', '3$'))
+```
+
+
+# Further lectures
+
+* [Regular expression notes](http://sux13.github.io/DataScienceSpCourseNotes/3_GETDATA/Getting_and_Cleaning_Data_Course_Notes.html) of the Data Science course in coursera. Go the RegEx section using Ctrl+F.
+
+* [Regular expressions as used in R](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html). Fuller R documentation. 
+
+
 
