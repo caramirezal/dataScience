@@ -1,0 +1,210 @@
+---
+title: "Lecture 7.2. Data visualization - Categories"
+author: "Carlos Ramirez Alvarez"
+date: "9/9/2019"
+output: html_document
+---
+
+# Categories
+
+Visualization of categories or groups is important for inspecting differences between experimental conditions. For example, when assessing efficacy of a drug is necessary to evaluate cases vs controls groups. Another example is evaluation of gene expression in subsets of cells which are sorted according to some phenotype.
+
+Categories can be visualized by:
+
+* Colors - a color represent a category.
+
+* Positions - data from categories are plotted at varying positions in an axis. 
+
+* Panels - data are shown in separated plots in the same panel.
+
+Let's load the Moignard's data.
+
+## Data preprocessing
+
+Our goal is to visualize gene expression patterns by **cell type** in Moignard's data.
+
+```{r}
+path <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/NIHMS53736-supplement-9.csv'
+transcripts <- read.csv(path, header = TRUE)
+```
+
+As you can see from the original paper or by reading the [documentation](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE42518) of the data, the first column of the dataframe contains cell along with an id. 
+
+```{r}
+head(transcripts$Cell)
+```
+
+For example, CLP001 refers to a Common Lymphoid Progenitor. Hence, we will extract the type of cell from this column by using the first 3 letters from id column using subst() function as follows:
+
+```{r}
+head(
+     ## extract substring from 1th to 3th letter
+     substr(transcripts$Cell, start = 1, stop = 3)      
+)
+```
+
+Let's use substr() and dplyr to process Moignard's data.
+
+```{r message=FALSE}
+library(dplyr)
+transCategories <- mutate(transcripts,
+                          Cell = substr(transcripts$Cell, start = 1, stop = 3))
+```
+
+As you can see from the following output, now there are only five unique cell types in the *Cell* column that we can use as categories.
+
+```{r}
+unique(transCategories$Cell)
+```
+
+
+
+We will assign customized colors by defining a new column *cellColor* that maps cell type to assigned color using the very handy function mapvalues from the plyr library (don't confuse with dplyr).
+
+Think mapvalues() as a function which reassign tags.
+
+mapvalues() function takes three parameters:
+
+* x - a vector with the values you want to reassign.
+
+* from - old values.
+
+* to - new values.
+
+```{r}
+cellColor <- plyr::mapvalues(x = transCategories$Cell,
+                from = unique(transCategories$Cell),
+                to = c('green', 'red', 'steelblue', 'purple', 'orange'))
+```
+
+NOTE: functions can be called by using library_name::function_name as done in this example. When doing this we do not need to load the library.
+
+
+# Visualization of categories by colors
+
+## col parameter - Plotting points by colors. 
+
+```{r}
+with(transCategories,
+     plot(PU.1, Kit,
+          col = cellColor)      ## col parameter
+)
+```
+
+## RowSideColors parameter - Plotting categories in heatmap.
+
+We can color code heatmap clustering using RowSideColors parameter.
+
+```{r}
+heatmap(as.matrix(
+        select(transCategories, Abl1:Ubc)),
+        RowSideColors = cellColor                ## color categories
+)
+```
+
+
+# Layers
+
+## points() - Adding layers of points. 
+
+points() add points to a previous plot. 
+
+Let's create a plot of points as red triangules for the HSC and then add a layer of green empty points for GMP.
+
+```{r}
+gmp <- filter(transCategories, Cell == 'GMP')
+hsc <- filter(transCategories, Cell == 'HSC')
+
+## plot HSC as red triangules
+with(hsc,
+     plot(PU.1, Kit,
+          col = 'red',
+          pch = 17)
+)
+
+## Adding layer of points
+with(gmp,
+     points(PU.1, Kit,
+          col = 'green',
+          pch = 21)
+)
+```
+
+
+## abline() - Adding lines.
+
+We will use abline() function to add a line to a points plot by specifying a slope coefficient.
+
+```{r}
+## plot HSC as red triangules
+with(hsc,
+     plot(PU.1, Kit,
+          col = 'red',
+          pch = 17)
+)
+
+## Adding line 
+with(hsc,
+     abline(lm(Kit ~ PU.1), 
+            col='red')
+)
+```
+
+
+
+# Plotting categories along x axis
+
+```{r}
+with(transCategories,
+     boxplot(PU.1 ~ Cell,
+             col = c('green', 'red', 'steelblue', 'purple', 'orange'))
+)
+```
+
+
+
+# Multiple panels
+
+## par(mfrow) parameter - Define plot panels.
+
+The function par() defines plotting parameters in a global manner. Where global means that affects all plots.
+
+mfrow par() parameter accepts a numerical vector of length 2, the first and second entry of this vector define the number of rows and columns, respectively.
+
+```{r}
+par(mfrow=c(1,2))                 ## one row, two columns panel 
+
+## plot HSC as red triangules
+with(hsc,
+     plot(PU.1, Kit)
+)
+
+## Adding layer of points
+with(gmp,
+     plot(PU.1, Kit)
+)
+```
+
+NOTE: par() function is a very important function for plotting. It has 72 customizable parameters! You should take a look at its documentation.
+
+## Trello plots
+
+As you may see from the previous examples. Definition of multiple panels and layers can be a very long process. The idea of trello plots is to create as many as possible layers and plot panels for inspecting data as you can see from the following graph.
+
+```{r message=FALSE}
+library(lattice)
+
+xyplot(PU.1 ~ Kit | Cell, data=transCategories,
+       panel = function(x, y, ...) {
+        # call the default panel function for xyplot
+    panel.xyplot(x, y, ..., col = 'steelblue')
+    # adds a horizontal line at the median
+    panel.abline(h = median(y), lty = 2, col = 'red')
+})
+```
+
+Although base and trello plotting are very useful functions to explore our data. We will see in the next chapter that ggplot implements another conceptual plotting system that incorporates ideas from these frameworks but at the same time allows more complex plots by using a grammar for data visualization.
+
+## Further references
+
+* [Coursera notes](http://sux13.github.io/DataScienceSpCourseNotes/4_EXDATA/Exploratory_Data_Analysis_Course_Notes.html#graphics-device). On exploratory data analysis.
