@@ -1,0 +1,139 @@
+---
+title: "Lecture 7.1. Data visualization - Intro"
+author: "Carlos Ramirez Alvarez"
+date: "9/7/2019"
+output: html_document
+---
+
+# Base plottings
+
+
+Base plottings refers to build in functions for data visualization. They are specially useful for exploratory data analysis.
+
+Let's load the Moignard data.
+
+```{r}
+path <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/NIHMS53736-supplement-9.csv'
+transcripts <- read.csv(path, header = TRUE)
+```
+
+## plot() - Plotting points.
+
+Now, we will plot expression values of Abl1 vs Erg in points graph. In the most primitive form we can use the following syntaxis.
+
+```{r}
+plot(transcripts$Abl1, transcripts$Eif2b1)
+```
+
+## with() - Makes columns available by its name.
+
+Function with() avoids the necessity of writting the name of the data frame many times and makes the code more readable.
+
+The following function is equivalent to the previous code.
+
+```{r, results='hide'}
+with(transcripts, 
+     plot(Abl1, Erg)
+)
+```
+
+## hist() - Histograms.
+
+```{r}
+with(transcripts,
+     hist(PU.1)
+)
+```
+
+
+## Multiple plots
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+## selecting a set of genes in the data frame
+selectedTranscripts <- select(transcripts, Abl1:Fli1)
+## plotting
+plot(selectedTranscripts)
+```
+
+## heatmap() 
+
+Heatmaps are graphical representations for matrices where color codes in the cells of the heatmap are proportional to the entries in the matrix. 
+
+Heatmaps can be rearranged according to the similarity of the rows and columns in the matrix.
+
+heatmap() only works with numerical matrices.
+
+```{r}
+## Processing data
+## selecting numerical data
+transcripts.num <- select(transcripts, Abl1:Ubc)
+## transforming dataframe to matrix
+transcripts.m <- as.matrix(transcripts.num)
+
+heatmap(transcripts.m)
+```
+
+
+## Adding colors and annotations
+
+Base plots have many parameters in order to improve visualizations. Here, we give some example parameters.
+
+* col - color of the points, lines, bar, etc...
+
+* pch - type of the point. Find a list of point types [here](http://www.endmemo.com/program/R/pchsymbols.php). 
+
+* cex - size of the point.
+
+* main - plot tittle.
+
+* xlab - x axis label.
+
+* ylab - y axis label.
+
+```{r, results='hide'}
+with(transcripts, 
+     plot(Abl1, Erg,
+          col ='steelblue',
+          pch =21,
+          cex =1.5,
+          main = 'Gene Expression profiles',
+          xlab = 'Abl1 expression',
+          ylab = 'Erg expression'
+     )
+)
+
+```
+
+## Saving plots
+
+The output plots can be displayed in screen or saved in many formats (jpeg, pdf, etc..). The types of outputs are known as graphical devices. Here, we give a list of image formats functions to plot in R, as you can see their names are related to image formats you are probably familiar.
+
+* jpeg()
+
+* png()
+
+* pdf()
+
+* svg()
+
+For example, let's save the heatmap plot implemented above using pdf format.
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+svg('heatmapMoignardPlot.svg')     ## saving to svg file format
+heatmap(transcripts.m)
+dev.off()                          ## closing device
+```
+
+The output plot is now redirected to the file in the current directory. 
+
+NOTE: Don't forgive the ```dev.off()``` part, since this tells R that the plot is finished and hence it can save the file.
+
+## Further references
+
+* [Coursera Notes](http://sux13.github.io/DataScienceSpCourseNotes/4_EXDATA/Exploratory_Data_Analysis_Course_Notes.html#graphics-device). Coursera notes on Exploratory Data Analysis.
+
+
+
+
+
