@@ -1,0 +1,144 @@
+---
+title: "Lecture 7. Data visualization - Dates and times"
+author: "Carlos Ramirez Alvarez"
+date: "9/16/2019"
+output: html_document
+---
+
+Plotting changes in values over time is important to see dynamical patterns. Using time and dates is a crucial skill. In biomedical science is common to have sample records tagged with date information. Dates and times are commonly given in the form of a string or text in a column of a table of records. Here we will see how to handle dates  with some real life final example plotting magnitude and deep of tremors in Mexico.
+
+## Handling date and times
+
+In order to use character string dates as a continous time axis they must be interpreted or casted to date objects. There are two types of data objects in R:
+
+* POSIXlt - based on a list.
+
+* POSIXct - essentially a integer given in UNIX Epoch time.
+
+Don't bother to much with these definitions since both objects can be converted into each other and the recommendation is to use the one that easily fits your needs.
+
+Let's use Sys.time() to get the date and time in our computer: 
+
+```{r}
+time <- Sys.time()
+time
+```
+
+Then, verify the class of the object. As you can see from the output. In fact this object can be interpreted as both POSIXct and POSIXlt classes.
+
+```{r}
+class(time)
+```
+
+## as.Date() - coerce string to date-time.
+
+Some simple formats can be coerced in a straightforward manner using as.Date(). For example, '2019-09-20'.
+
+```{r}
+date <- as.Date('2019-09-20')
+```
+ 
+ Unfortunately, dates and times are given in many formats. Hence, in the next section we will see how to manipulate dates and times formats.
+ 
+## Date and times formats
+
+strptime() function parses strings into dates. It takes the following two parameters:
+
+* date - as a string character o string vector.
+
+* format - a string indicating the format of the date.
+
+This would be clear by using examples.
+
+```{r}
+strptime('Septiembre 20, 2019 17:40', "%B %d, %Y %H:%M")
+```
+
+In the second string argument passed to strptime() ```"%B %d, %Y %H:%M"```, the percentage symbol `%` followed by a character represents a time unit given in a specific format. For example `%B` represents months given as whole text name whilst `%d` represents days in number format. You don't need to remember all possible string formats, instead it is advisable to consult documentation using ?strptime.
+
+Let's see another example formats. Note the difference for the separators.
+
+```{r}
+strptime('20/Sep/2019 17:40', "%d/%b/%Y %H:%M")
+```
+
+Let's see another example formats.
+
+```{r}
+strptime('20 Septiembre 2019', "%d %B %Y")
+```
+
+```{r}
+strptime('2019:09:20 17:40', "%Y:%m:%d %H:%M")
+```
+
+## Lubridate Package for handling dates
+
+Lubridate R package can be used to manage dates and times by using generic functions without the need of passing string formats patterns as in strptime. 
+
+```{r warning=FALSE, message=FALSE}
+library(lubridate)
+```
+
+We wil parse the previous defined strings to dates using lubridate. We can transform the string `'20/Sep/2019 17:40'` to date by using the function dmy_hm() which means day-month-year_hour-minute.
+
+```{r}
+dmy_hm('20/Sep/2019 17:40')
+```
+
+Another example.
+
+```{r}
+dmy('20 Septiembre 2019')
+```
+
+Note that we don't need to specify the format and lubridate is able to figure out how to interpret dates.
+
+```{r}
+ymd_hm('2019:09:20 17:40')
+```
+
+You can handle allmost all type of dates and times formats with lubridate by using combinations of d-m-y and h-m-s. Lubridates also provides a clear and easy to remember syntaxis.
+
+## Historical records of tremors in Mexico
+
+We will look at the data from the Sismologico Nacional recording magnitud and deep of tremors registered in Mexico.
+
+Our goal is to visualize the pattern of magnitud of tremors during the last year. 
+
+First, we will load the data into R.
+
+```{r}
+## Find the data in http://www2.ssn.unam.mx:8080/catalogo/
+url <- 'https://raw.githubusercontent.com/caramirezal/dataScience/master/data/tremors.csv'
+tremors <- read.csv(url,
+                    skip = 4,
+                    header = TRUE,
+                    stringsAsFactors = FALSE)
+tremors <- tremors[complete.cases(tremors),]
+str(tremors)
+```
+
+We will use dplyr functions to process the data.
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+
+## Processing the data
+tremors.p <- tremors %>% 
+              mutate(
+                      Fecha_Hora = paste(Fecha, Hora),  ## paste data and time cols
+                      time = ymd_hms(Fecha_Hora),       ## parsing time with lubridate
+                      Magnitud = as.numeric(Magnitud)   ## casting value to numeric
+                     ) %>%
+             filter(time > '2019-01-01' & ! is.na(Magnitud)) 
+
+## Plotting magnitude histogram
+with(tremors.p,
+     hist(Magnitud, breaks = 100,
+          main = 'Magnitud of tremors in Mexico 2019'))
+```
+
+Note that we use `time > '2019-01-01'` in the filter function to obtain records in 2019. You can use *<*, *>* and *=* algebraic operators to define time intervals.
+
+From the plot it can be seen that the vast majority of tremors is around ~3.6.
