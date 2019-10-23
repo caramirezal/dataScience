@@ -1,0 +1,88 @@
+---
+title: "Lecture 7. Data visualization - Points with trending curves"
+author: "Carlos Ramirez Alvarez"
+date: "10/8/2019"
+output: html_document
+---
+
+Here, we will exemplify how to make a points plot using data from magnitud of tremors in Mexico. As done previously, we will load the tremors data into R as follows:
+
+```{r}
+## Find the data in http://www2.ssn.unam.mx:8080/catalogo/
+tremors <- read.csv('../data/tremors.csv',
+                    skip = 4,
+                    header = TRUE,
+                    stringsAsFactors = FALSE)
+```
+
+In this case, we will plot the dynamics of tremors magnitud, that is, time *vs* magnitud.
+
+In order to do that we will preprocess the data with the following steps:
+
+* NAs are removed
+
+* Date and times columns are concatenated and parsed using lubridate
+
+* Magnitud is casted to numeric
+
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+library(lubridate)
+
+## Processing the data
+tremors.p <- tremors %>% 
+                 na.omit %>%
+                   mutate(
+                      ## paste data and time cols
+                      Fecha_Hora = paste(Fecha, Hora),  
+                      ## parsing time with lubridate
+                      time = ymd_hms(Fecha_Hora),    
+                      ## casting value to numeric
+                      Magnitud = as.numeric(Magnitud)   
+                     ) %>%
+             filter(
+                     time > '1985-01-01' & ! is.na(Magnitud)
+) 
+
+```
+
+Now, we can create the points plot using the geometry `geom_point()` ggplot component.
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+
+## plotting
+tremors.p %>% 
+        ggplot(aes(x=time, y=Magnitud)) +
+             geom_point()  
+```
+
+That's a very simple points plot. We will add a line showing the trends of the magnitud dynamic using `geom_smooth`. This smooth line is defined by taking intervals in the x axis, calculating the local mean and drawing a line passing through that mean values (see *?geom_smooth*). Additionally, we will add a nice formating or theme using `theme_set()` ggplot function (see *?theme_set* for more themes).
+
+```{r warning=FALSE, message=FALSE}
+## setting nice format
+theme_set(theme_light())
+
+## plotting
+tremors.p %>% 
+        ggplot(aes(x=time, y=Magnitud)) +
+             geom_point() + 
+                geom_smooth()
+```
+
+We can use another types of curves to fit the data in order to see trends. For example, we can fit a linear model by using `geom_smooth(method = 'lm')` as follows.
+
+```{r warning=FALSE, message=FALSE}
+## setting nice format
+theme_set(theme_light())
+
+## plotting
+tremors.p %>% 
+        ggplot(aes(x=time, y=Magnitud)) +
+             geom_point() + 
+                geom_smooth(method = 'lm')
+```
+
+As you can see, tremors behaviors are a very stochastic process and there is no linear behavior of magnitud over time. 
+
