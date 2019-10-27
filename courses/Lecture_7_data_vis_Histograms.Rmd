@@ -1,0 +1,105 @@
+---
+title: "Lecture 7. Data visualisation - Histograms (and facets)"
+author: "Carlos Ramirez Alvarez"
+date: "10/27/2019"
+output: html_document
+---
+
+In this lecture, we will learn how to make histograms and introduce a new ggplot property, facets. This property implements multipanel data plotting as we saw using trello.
+
+We will use Moignard's data. 
+
+```{r}
+data <- read.csv('../data/NIHMS53736-supplement-9.csv')
+str(data)
+```
+
+* Our goal is to plot gene expression distrubution for PU.1 in the different cell subtypes. 
+
+We will preprocess the data as done before. Remember that the first three letters in the Cell column refers to blood tissue subtype. 
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+
+transcripts <- mutate(data, subtype = substr(Cell, start = 1, stop = 3)) %>%
+                  select(-Cell) 
+```
+
+The `geom_histogram` can be used to create histograms. Let's plot PU.1 expression distribution over all evaluated cells.
+
+```{r warning=FALSE, message=FALSE}
+library(ggplot2)
+
+ggplot(data = transcripts, aes(x=PU.1)) +
+          geom_histogram()
+```
+
+The expression is centered at ~10 units of arbitrary expression. In this case, for this RNA-seq platform expression units correspond to the time until a signal was registered after amplification. That means, high values represents low gene expression and vice versa. 
+
+Let's transform the data in order to get more natural visualisation in which high values in the x-axes also represents more gene expression. 
+
+We will use the following transformation:
+
+$PU.1_t = 1 / ( log(PU.1) + 1 )$
+
+We will use this $PU.1_t$ instead of the original value. The following piece code transforms the vaue and then creates a plot at once.
+
+```{r warning=FALSE, message=FALSE}
+library(ggplot2)
+
+transcripts %>% 
+        mutate(PU.1 = 1/(log(PU.1) + 1 )) %>%       ## transforming values
+          ggplot(aes(x=PU.1)) +
+             geom_histogram()
+```
+
+Now, let's visualise $PU.1_t$ gene expression by tissue subtype using colors using the parameter `fill`. This parameter fills the histogram with color and when a vector of categories or labels is given separated histograms corresponding to that groups are plotted.
+
+```{r warning=FALSE, message=FALSE}
+library(ggplot2)
+
+transcripts %>% 
+        mutate(PU.1 = 1/(log(PU.1) + 1 )) %>%       
+          ggplot(aes(x=PU.1, fill=subtype)) +
+             geom_histogram()
+```
+
+It's been reported that Megacariocytes/Eritrocytes Precursors (shown as Pre) have low PU.1 levels because GATA.1 is expressed in those cells which is an antagonist of PU.1 gene expression. At the other hand, Monocytes and Dendrytic cells derived from GMP do express PU.1.  
+
+Now, we will use the geometry `geom_density` that fits a smooth distribution curve through the frequency values. Additionally, we will change the theme of the plot using `theme_set` for a nice presentation.
+
+```{r warning=FALSE, message=FALSE}
+library(ggplot2)
+
+theme_set(theme_light())       ## changing theme
+transcripts %>% 
+        mutate(PU.1 = 1/(log(PU.1) + 1 )) %>%   
+          ggplot(aes(x=PU.1, fill=subtype)) +
+             geom_density()    ## using densities plot instead
+```
+
+This looks nice but a little bit clumpsy. We could try to separate distribution in order to improve inspection.
+
+## Facets
+
+We could instead of visualising all distributions in a single plot try to use multiple panels as in trello plots. We can do this in ggplot easily by using `facet_wrap`. Facets is another essential property for gpplot objects just as aesthetics, geometry and data.
+
+```{r warning=FALSE, message=FALSE}
+library(ggplot2)
+
+theme_set(theme_light()) 
+transcripts %>% 
+        mutate(PU.1 = 1/(log(PU.1) + 1 )) %>%   
+          ggplot(aes(x=PU.1)) +
+             geom_density(fill='gray') + ## steel blue fill
+              facet_wrap(~subtype, ncol=1)   ## Using facets
+```
+
+
+Now, we can see more clearly that PU.1 is more expressed in GMP cells *vs* Megakariocytes/Eritrocytes precursor cells.
+
+## Exercises
+
+* 1. Try using `nrow=1` instead of ncol inside `facet_wrap`. What's is the difference? 
+
+* 2. Type `theme_set()` and try another theme different from `theme_light()`. Use the tab key to list down other options.
