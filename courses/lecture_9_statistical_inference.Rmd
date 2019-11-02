@@ -1,0 +1,56 @@
+---
+title: "Statistical inference"
+author: "Carlos Ramirez Alvarez"
+date: "11/2/2019"
+output: html_document
+---
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+InsectSprays %>%
+        head
+```
+
+```{r}
+InsectSprays %>%
+        ggplot() +
+            geom_boxplot(aes(x=spray, y=count))
+        
+```
+
+```{r}
+sims <- data.frame('control'=rnorm(100, mean = 0),
+                   'treatment_1'=rnorm(100, mean = 0.5),
+                   'treatment_2'=rnorm(100, mean = 4)
+                   )
+
+head(sims)
+```
+
+* Our goal is to quantify the difference between sample values.
+
+```{r}
+library(reshape2)
+library(dplyr)
+
+sims %>% 
+        melt() %>%
+        head()
+```
+
+```{r}
+library(ggplot2)
+
+sims %>%
+        melt() %>%
+        ggplot(aes(x=value, fill=variable)) +
+            geom_density(alpha=0.5) +
+            facet_wrap(~variable, ncol = 1)
+```
