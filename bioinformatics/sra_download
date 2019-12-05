@@ -1,0 +1,7 @@
+## Downloading data from SRA
+./sc/sratoolkit.2.9.6-1-mac64/bin/prefetch SRR8528318 -o SRR8528318.sra
+
+## Converting sra files to fastq
+./sc/sratoolkit.2.9.6-1-mac64/bin/fastq-dump --outdir . --split-3 SRR8528318.sra 
+
+##
