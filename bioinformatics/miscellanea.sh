@@ -6,3 +6,5 @@ open -a Rstudio
 scp \
    data/SRR_Acc_List.txt \
    bq_cramirez@???.uni-heidelberg.de:/home/bq_cramirez/data/SRR_Acc_List.txt
+   
+ ## 
