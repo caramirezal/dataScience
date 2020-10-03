@@ -1,0 +1,26 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	copy
+	1
+
+[Sat Oct  3 22:07:44 2020]
+rule copy:
+    input: input/hola.txt, input/adios.txt
+    output: output/hola_y_adios.txt
+    jobid: 0
+
+[Sat Oct  3 22:07:44 2020]
+Error in rule copy:
+    jobid: 0
+    output: output/hola_y_adios.txt
+    shell:
+        cat input/hola.txt input/adios.txt > output
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/.snakemake/log/2020-10-03T220744.454615.snakemake.log

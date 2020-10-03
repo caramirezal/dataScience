@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 8 of /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/03_expand:
+Missing input files for rule copy:
+input/hola.txt

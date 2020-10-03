@@ -1,0 +1,28 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	call_python
+	1
+
+[Sun Oct  4 00:04:56 2020]
+rule call_python:
+    input: output/hola_y_adios.txt
+    output: output/python_output.txt
+    jobid: 0
+
+[Sun Oct  4 00:04:56 2020]
+Error in rule call_python:
+    jobid: 0
+    output: output/python_output.txt
+
+RuleException:
+CalledProcessError in line 28 of /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/04_calling_python:
+Command 'set -euo pipefail;  /home/bq_cramirez/miniconda2/envs/snakemake/bin/python3.6 /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/.snakemake/scripts/tmphpeb1nh9.write_string.py' returned non-zero exit status 1.
+  File "/media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/04_calling_python", line 28, in __rule_call_python
+  File "/home/bq_cramirez/miniconda2/envs/snakemake/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/.snakemake/log/2020-10-04T000456.410985.snakemake.log

@@ -1,0 +1,13 @@
+## This script exemplifies how to access wildcards 
+## in a snakemake workflow. Can be executed as before:
+## > snakemake -s 02_accesing_wildcards output/hola_mundo.txt
+
+rule copy:
+    input:
+        'input/{file_name}.txt'
+    output:
+        'output/{file_name}.txt'
+    shell:
+        'cp {input} {output}; cp {input} output/{wildcards.file_name}.backup'
+
+

@@ -1,0 +1,31 @@
+## Calling the python script sc/write_string.py
+## using snakemake
+
+## Definition of wildcards names
+FILES = ["hola", "adios"]
+
+rule all:
+    input:
+        "output/python_output.txt"
+
+
+
+
+rule copy:
+    input:
+        expand("input/{file_name}.txt", file_name=FILES)
+    output:
+        "output/hola_y_adios.txt"
+    shell:
+        "cat {input} > {output}"
+
+
+
+
+rule call_python:
+    input:
+        "output/hola_y_adios.txt"
+    output:
+        "output/python_output.txt"
+    script:
+        "sc/write_string.py"

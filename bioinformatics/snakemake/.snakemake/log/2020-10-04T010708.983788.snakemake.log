@@ -1,0 +1,40 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	call_python
+	1	copy
+	3
+
+[Sun Oct  4 01:07:09 2020]
+rule copy:
+    input: input/hola.txt, input/adios.txt
+    output: output/hola_y_adios.txt
+    jobid: 2
+
+[Sun Oct  4 01:07:09 2020]
+Finished job 2.
+1 of 3 steps (33%) done
+
+[Sun Oct  4 01:07:09 2020]
+rule call_python:
+    input: output/hola_y_adios.txt
+    output: output/python_output.txt
+    jobid: 1
+
+[Sun Oct  4 01:07:09 2020]
+Finished job 1.
+2 of 3 steps (67%) done
+
+[Sun Oct  4 01:07:09 2020]
+localrule all:
+    input: output/python_output.txt
+    jobid: 0
+
+[Sun Oct  4 01:07:09 2020]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/.snakemake/log/2020-10-04T010708.983788.snakemake.log

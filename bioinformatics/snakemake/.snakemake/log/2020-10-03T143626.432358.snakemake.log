@@ -1,0 +1,20 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	copy
+	1
+
+[Sat Oct  3 14:36:26 2020]
+rule copy:
+    input: input/hola_mundo.txt
+    output: output/hola_mundo.txt
+    jobid: 0
+    wildcards: file_name=hola_mundo
+
+[Sat Oct  3 14:36:26 2020]
+Finished job 0.
+1 of 1 steps (100%) done
+Complete log: /media/ag-cherrmann/cramirez/dataScience/bioinformatics/snakemake/.snakemake/log/2020-10-03T143626.432358.snakemake.log

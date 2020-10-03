@@ -1,0 +1,20 @@
+## This script exemplifies how to use the expand function
+## this snakemake script can run in the command shell as:
+## snakemake -R copy -s 03_expand
+## NOTE: -R argument force snakemake to run a rule
+## in this case copy
+
+
+## Definition of wildcards names
+FILES = ["hola", "adios"]
+
+
+rule copy:
+    input:
+        expand("input/{file_name}.txt", file_name=FILES)
+    output:
+        "output/hola_y_adios.txt"
+    shell:
+        "cat {input} > {output}"
+
+
